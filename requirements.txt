@@ -4,4 +4,4 @@ Flask-Limiter==2.7.0
 qrcode==7.3.1
 Pillow==9.5.0
 Flask-WTF @ git+https://github.com/wtforms/flask-wtf.git@main
-waitress
+gunicorn==20.1.0
