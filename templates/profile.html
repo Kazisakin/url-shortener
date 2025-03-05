@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center text-dark">Profile Settings</h3>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Current Username</label>
+                            <input type="text" class="form-control" value="{{ current_user.username }}" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Leave blank to keep current">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

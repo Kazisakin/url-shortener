@@ -1,7 +1,10 @@
-Flask==2.2.5
-Flask-SQLAlchemy==3.0.2
-Flask-Limiter==2.7.0
-qrcode==7.3.1
-Pillow==9.5.0
-Flask-WTF @ git+https://github.com/wtforms/flask-wtf.git@main
-gunicorn==20.1.0
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-Limiter
+werkzeug
+qrcode[pil]
+requests
+gunicorn
+redis
+Flask-Migrate

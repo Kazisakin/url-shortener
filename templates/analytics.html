@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container py-5">
+        <h1 class="mb-4 fw-bold text-dark">Analytics for {{ request.host_url }}{{ url.short_alias }}</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-12 text-end">
+                <a href="{{ url_for('dashboard.export_analytics', short_alias=url.short_alias) }}" class="btn btn-outline-primary rounded-3"><i class="bi bi-download me-2"></i>Export Analytics</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Click Trends</h5>
+                        {% if daily_clicks %}
+                            <canvas id="clickTrendsChart"></canvas>
+                        {% else %}
+                            <p class="text-muted text-center">No click data available. Click the URL to generate analytics.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Device Breakdown</h5>
+                        {% if device_data and device_data|sum(attribute='count') > 0 %}
+                            <canvas id="deviceChart"></canvas>
+                        {% else %}
+                            <p class="text-muted text-center">No device data available. Click the URL to generate analytics.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Geolocation</h5>
+                        {% if geo_data %}
+                            <canvas id="geoChart"></canvas>
+                        {% else %}
+                            <p class="text-muted text-center">No geolocation data available. Click the URL to generate analytics.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- prettier-ignore -->
+    <script>
+        {% if daily_clicks %}
+        // Click Trends Chart
+        const dailyClicks = {{ daily_clicks | safe }};
+        const clickLabels = dailyClicks.map(d => d.date);
+        const clickData = dailyClicks.map(d => d.clicks);
+        new Chart(document.getElementById('clickTrendsChart'), {
+            type: 'line',
+            data: {
+                labels: clickLabels,
+                datasets: [{
+                    label: 'Clicks Over Time',
+                    data: clickData,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Date', color: '#333' }, ticks: { color: '#333' } },
+                    y: { title: { display: true, text: 'Clicks', color: '#333' }, ticks: { color: '#333' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#333' } }
+                }
+            }
+        });
+        {% endif %}
+
+        {% if device_data and device_data|sum(attribute='count') > 0 %}
+        // Device Breakdown Chart
+        const deviceData = {{ device_data | safe }};
+        const deviceLabels = deviceData.map(d => d.device);
+        const deviceCounts = deviceData.map(d => d.count);
+        new Chart(document.getElementById('deviceChart'), {
+            type: 'pie',
+            data: {
+                labels: deviceLabels,
+                datasets: [{
+                    label: 'Device Breakdown',
+                    data: deviceCounts,
+                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { labels: { color: '#333' } }
+                }
+            }
+        });
+        {% endif %}
+
+        {% if geo_data %}
+        // Geolocation Chart
+        const geoData = {{ geo_data | safe }};
+        const geoLabels = geoData.map(g => g.city);
+        const geoCounts = geoData.map(g => g.count);
+        new Chart(document.getElementById('geoChart'), {
+            type: 'bar',
+            data: {
+                labels: geoLabels,
+                datasets: [{
+                    label: 'Clicks by Location',
+                    data: geoCounts,
+                    backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                    borderColor: '#007bff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'City', color: '#333' }, ticks: { color: '#333' } },
+                    y: { title: { display: true, text: 'Clicks', color: '#333' }, ticks: { color: '#333' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#333' } }
+                }
+            }
+        });
+        {% endif %}
+
+        // Dark Mode Chart Updates
+        if (document.body.classList.contains('dark-mode')) {
+            const charts = [Chart.getChart('clickTrendsChart'), Chart.getChart('deviceChart'), Chart.getChart('geoChart')];
+            charts.forEach(chart => {
+                if (chart) {
+                    chart.options.scales.x.title.color = '#e0e0e0';
+                    chart.options.scales.x.ticks.color = '#e0e0e0';
+                    chart.options.scales.y.title.color = '#e0e0e0';
+                    chart.options.scales.y.ticks.color = '#e0e0e0';
+                    chart.options.plugins.legend.labels.color = '#e0e0e0';
+                    chart.update();
+                }
+            });
+        }
+    </script>
+{% endblock %}
